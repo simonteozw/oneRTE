@@ -9,7 +9,7 @@ import richText from 'rich-text';
 Sharedb.types.register(richText.type);
 
 // Connecting to socket server
-const socket = new WebSocket('ws://127.0.0.1:8080');
+const socket = new WebSocket('ws://localhost:8080');
 const connection = new Sharedb.Connection(socket);
 
 // Query for our document
@@ -24,7 +24,7 @@ function App() {
       const options = {
         theme: "bubble",
         modules: {
-          toilbar: toolbarOptions,
+          toolbar: toolbarOptions,
         }
       };
       let quill = new Quill("#editor", options);
@@ -39,7 +39,7 @@ function App() {
        * On Text change publishing to our server
        * so that it can be broadcasted to all other clients
        */
-      quill.on("text-change", function(delta, onDelta, source) {
+      quill.on("text-change", function(delta, oldDelta, source) {
         if (source !== "user") return;
         doc.submitOp(delta, { source: quill });
       });
@@ -56,6 +56,12 @@ function App() {
       connection.close();
     }
   }, []);
+
+  return (
+    <div style={{ margin: '5%', border: '1px solid' }}>
+      <div id='editor'></div>
+    </div>
+  );
 }
 
 export default App;
