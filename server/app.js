@@ -19,6 +19,17 @@ const connection = shareDBServer.connect();
  */
 const doc = connection.get('documents', 'firstDocument');
 
+function setupStream() {
+    const wss = new WebSocket.Server({ port: 8080 });
+
+    wss.on("connection", function connection(ws) {
+        // For transport we are using a ws JSON stream for communication
+        // that can read and write js objects.
+        const jsonStream = new WebSocketJSONStream(ws);
+        shareDBServer.listen(jsonStream);
+    });
+}
+
 doc.fetch(function (err) {
     if (err) throw err;
     if (doc.type === null) {
@@ -30,14 +41,3 @@ doc.fetch(function (err) {
         return;
     }
 });
-
-function setupStream() {
-    const wss = new WebSocket.Server({ port: 8080 });
-
-    wss.on("connection", function connection(ws) {
-        // For transport we are using a ws JSON stream for communication
-        // that can read and write js objects.
-        const jsonStream = new WebSocketJSONStream(ws);
-        shareDBServer.listen(jsonStream);
-    });
-}
